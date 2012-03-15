@@ -9,9 +9,7 @@ module Sappho
   require 'thread'
   require 'logger'
 
-  class AutoFlushLog
-
-    include Singleton
+  class MultiAutoFlushLog
 
     LOG_LEVELS = {
         'debug' => Logger::DEBUG,
@@ -24,23 +22,11 @@ module Sappho
         'message' => proc { |severity, datetime, progname, message| "#{message}\n" },
         'test' => proc { |severity, datetime, progname, message| "#{severity} #{message}\n" }
     }
-    @@file = nil
 
-    def AutoFlushLog.file file
-      @@file = file
-    end
-
-    def initialize
+    def initialize file, level, detail
       @mutex = Mutex.new
-      unless @@file
-        filename = ENV['application.log.filename']
-        mode = File.exists?(filename) ? 'a' : 'w' if filename
-        @@file = filename ? File.open(filename, mode) : $stdout
-      end
-      @log = Logger.new @@file
-      level = ENV['application.log.level']
+      @log = Logger.new file
       @log.level = LOG_LEVELS.has_key?(level) ? LOG_LEVELS[level] : Logger::INFO
-      detail = ENV['application.log.detail']
       @log.formatter = LOG_DETAIL[detail] if LOG_DETAIL.has_key?(detail)
     end
 
@@ -83,6 +69,27 @@ module Sappho
 
     def debug?
       @log.debug?
+    end
+
+  end
+
+  class AutoFlushLog < MultiAutoFlushLog
+
+    include Singleton
+
+    @@file = nil
+
+    def AutoFlushLog.file file
+      @@file = file
+    end
+
+    def initialize
+      unless @@file
+        filename = ENV['application.log.filename']
+        mode = File.exists?(filename) ? 'a' : 'w' if filename
+        @@file = filename ? File.open(filename, mode) : $stdout
+      end
+      super @@file, ENV['application.log.level'], ENV['application.log.detail']
     end
 
   end
