@@ -13,10 +13,26 @@ module Sappho
 
     include Singleton
 
+    LOG_LEVELS = {
+        'debug' => Logger::DEBUG,
+        'info' => Logger::INFO,
+        'warn' => Logger::WARN,
+        'error' => Logger::ERROR,
+        'fatal' => Logger::FATAL,
+        'unknown' => Logger::UNKNOWN
+    }
+    LOG_DETAIL = {
+        'message' => proc { |severity, datetime, progname, message| "#{message}\n" }
+    }
+
     def initialize
       @mutex = Mutex.new
-      @log = Logger.new $stdout
-      @log.level = ENV['application.log.level'] == 'debug' ? Logger::DEBUG : Logger::INFO
+      filename = ENV['application.log.filename']
+      @log = Logger.new(filename ? open(filename, 'a') : $stdout)
+      level = ENV['application.log.level']
+      @log.level = LOG_LEVELS.has_key?(level) ? LOG_LEVELS[level] : Logger::INFO
+      detail = ENV['application.log.detail']
+      @log.formatter = LOG_DETAIL[detail] if LOG_DETAIL.has_key?(detail)
     end
 
     def info message
