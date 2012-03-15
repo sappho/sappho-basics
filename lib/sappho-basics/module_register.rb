@@ -37,6 +37,7 @@ module Sappho
         begin
           yield mod
         rescue
+          # do nothing here - modules must report if they need to
         end
       end
     end

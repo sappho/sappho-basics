@@ -27,7 +27,7 @@ module Sappho
     def initialize
       @mutex = Mutex.new
       filename = ENV['application.log.filename']
-      @log = Logger.new(filename ? open(filename, 'a') : $stdout)
+      @log = Logger.new(filename ? File.open(filename, 'a') : $stdout)
       level = ENV['application.log.level']
       @log.level = LOG_LEVELS.has_key?(level) ? LOG_LEVELS[level] : Logger::INFO
       detail = ENV['application.log.detail']
