@@ -33,7 +33,7 @@ module Sappho
       end if @log.debug?
     end
 
-    def info warn
+    def warn message
       @mutex.synchronize do
         @log.warn message
         $stdout.flush
