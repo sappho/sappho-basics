@@ -1,5 +1,4 @@
 .idea
-test-config/*
 *.gem
 .bundle
 Gemfile.lock

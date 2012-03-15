@@ -21,13 +21,23 @@ module Sappho
         'fatal' => Logger::FATAL
     }
     LOG_DETAIL = {
-        'message' => proc { |severity, datetime, progname, message| "#{message}\n" }
+        'message' => proc { |severity, datetime, progname, message| "#{message}\n" },
+        'test' => proc { |severity, datetime, progname, message| "#{severity} #{message}\n" }
     }
+    @@file = nil
+
+    def AutoFlushLog.file file
+      @@file = file
+    end
 
     def initialize
       @mutex = Mutex.new
-      filename = ENV['application.log.filename']
-      @log = Logger.new(filename ? File.open(filename, 'a') : $stdout)
+      unless @@file
+        filename = ENV['application.log.filename']
+        mode = File.exists?(filename) ? 'a' : 'w' if filename
+        @@file = filename ? File.open(filename, mode) : $stdout
+      end
+      @log = Logger.new @@file
       level = ENV['application.log.level']
       @log.level = LOG_LEVELS.has_key?(level) ? LOG_LEVELS[level] : Logger::INFO
       detail = ENV['application.log.detail']
@@ -65,7 +75,7 @@ module Sappho
 
     def fatal error
       @mutex.synchronize do
-        @log.fatal "fatal error! #{error.message}"
+        @log.fatal "error! #{error.message}"
         error.backtrace.each { |error| @log.fatal error }
         $stdout.flush
       end if @log.fatal?

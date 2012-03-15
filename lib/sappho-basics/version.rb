@@ -5,7 +5,7 @@
 
 module Sappho
   NAME = 'sappho-basics'
-  VERSION = '0.0.6'
+  VERSION = '0.0.7'
   AUTHORS = ['Andrew Heald']
   EMAILS = ['andrew@heald.co.uk']
   HOMEPAGE = 'https://github.com/sappho/sappho-basics/wiki'
