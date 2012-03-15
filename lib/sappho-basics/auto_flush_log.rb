@@ -18,8 +18,7 @@ module Sappho
         'info' => Logger::INFO,
         'warn' => Logger::WARN,
         'error' => Logger::ERROR,
-        'fatal' => Logger::FATAL,
-        'unknown' => Logger::UNKNOWN
+        'fatal' => Logger::FATAL
     }
     LOG_DETAIL = {
         'message' => proc { |severity, datetime, progname, message| "#{message}\n" }
@@ -35,18 +34,18 @@ module Sappho
       @log.formatter = LOG_DETAIL[detail] if LOG_DETAIL.has_key?(detail)
     end
 
-    def info message
-      @mutex.synchronize do
-        @log.info message
-        $stdout.flush
-      end if @log.info?
-    end
-
     def debug message
       @mutex.synchronize do
         @log.debug message
         $stdout.flush
       end if @log.debug?
+    end
+
+    def info message
+      @mutex.synchronize do
+        @log.info message
+        $stdout.flush
+      end if @log.info?
     end
 
     def warn message
@@ -62,6 +61,14 @@ module Sappho
         error.backtrace.each { |error| @log.error error }
         $stdout.flush
       end if @log.error?
+    end
+
+    def fatal error
+      @mutex.synchronize do
+        @log.fatal "fatal error! #{error.message}"
+        error.backtrace.each { |error| @log.fatal error }
+        $stdout.flush
+      end if @log.fatal?
     end
 
     def debug?
