@@ -10,10 +10,8 @@ module Sappho
 
   class ModuleRegister
 
-    include Singleton
-
-    def initialize
-      @modules = { :log => AutoFlushLog.instance }
+    def initialize modules = {}
+      @modules = modules
     end
 
     def set name, mod
@@ -34,12 +32,26 @@ module Sappho
 
     def each
       @modules.each do |name, mod|
-        begin
-          yield mod
-        rescue
-          # do nothing here - modules must report if they need to
+        if mod.instance_of? ModuleRegister
+          mod.each { |mod| yield mod }
+        else
+          begin
+            yield mod
+          rescue
+            # do nothing here - modules must report if they need to
+          end
         end
       end
+    end
+
+  end
+
+  class ApplicationModuleRegister < ModuleRegister
+
+    include Singleton
+
+    def initialize
+      super :log => ApplicationAutoFlushLog.instance
     end
 
   end

@@ -9,7 +9,7 @@ module Sappho
   require 'thread'
   require 'logger'
 
-  class MultiAutoFlushLog
+  class AutoFlushLog
 
     LOG_LEVELS = {
         'debug' => Logger::DEBUG,
@@ -73,7 +73,7 @@ module Sappho
 
   end
 
-  class AutoFlushLog < MultiAutoFlushLog
+  class ApplicationAutoFlushLog < AutoFlushLog
 
     include Singleton
 

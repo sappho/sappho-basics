@@ -13,13 +13,13 @@ class AutoFlushLogTest < Test::Unit::TestCase
 
   def test_logging
     file = StringIO.new
-    Sappho::AutoFlushLog.file file
+    Sappho::ApplicationAutoFlushLog.file file
     assert_raises NoMethodError do
-      Sappho::AutoFlushLog.new
+      Sappho::ApplicationAutoFlushLog.new
     end
     ENV['application.log.level'] = 'debug'
     ENV['application.log.detail'] = 'test'
-    log = Sappho::AutoFlushLog.instance
+    log = Sappho::ApplicationAutoFlushLog.instance
     assert log.debug?
     log.debug 'Test 1'
     log.info 'Test 2'
